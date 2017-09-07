@@ -2,6 +2,7 @@ package com.androidizate.clase9;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -12,6 +13,7 @@ import com.androidizate.clase9.helper.DatabaseHelper;
 import com.androidizate.clase9.model.Tag;
 import com.androidizate.clase9.model.Todo;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.List;
@@ -48,22 +50,32 @@ public class MainActivity extends AppCompatActivity {
     private void registrarUsuario() {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor edit = pref.edit();
+        edit.putBoolean("Sound", true);
+        int veces = pref.getInt("Veces", 0) + 1;
+        edit.putInt("Veces",veces);
         edit.putString("username", "billy");
         edit.putString("user_id", "65");
         edit.apply();
+        Toast.makeText(this," "+ veces + " ",Toast.LENGTH_SHORT).show();
     }
 
     private void populateFiles() {
-        try {
-            FileOutputStream fileout = openFileOutput("holamundo.txt", MODE_PRIVATE);
-            OutputStreamWriter outputWriter = new OutputStreamWriter(fileout);
-            outputWriter.write("Estoy en Androidizate!");
-            outputWriter.close();
+        try
+        {
+            File ruta_sd = Environment.getExternalStorageDirectory();
 
-            Toast.makeText(getBaseContext(), "Archivo Guardado Satifactoriamente!", Toast.LENGTH_SHORT).show();
+            File f = new File(ruta_sd.getAbsolutePath(), "prueba_sd.txt");
 
-        } catch (Exception e) {
-            e.printStackTrace();
+            OutputStreamWriter fout =
+                    new OutputStreamWriter(
+                            new FileOutputStream(f));
+
+            fout.write("LA TENES ADENTRO");
+            fout.close();
+        }
+        catch (Exception ex)
+        {
+            Log.e("Ficheros", "Error al escribir fichero a tarjeta SD");
         }
     }
 
@@ -205,4 +217,6 @@ public class MainActivity extends AppCompatActivity {
         }
         ((TextView) findViewById(resource)).setText(newText);
     }
+
+
 }
