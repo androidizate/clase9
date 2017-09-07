@@ -2,6 +2,7 @@ package com.androidizate.clase9;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -12,6 +13,7 @@ import com.androidizate.clase9.helper.DatabaseHelper;
 import com.androidizate.clase9.model.Tag;
 import com.androidizate.clase9.model.Todo;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.List;
@@ -48,22 +50,42 @@ public class MainActivity extends AppCompatActivity {
     private void registrarUsuario() {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor edit = pref.edit();
+        edit.putBoolean("Sound", true);
+        edit.putBoolean("Vibration", true);
+        int logueos = pref.getInt("Loggeos", 0) + 1;
+        edit.putInt("Loggeos", logueos);
         edit.putString("username", "billy");
         edit.putString("user_id", "65");
         edit.apply();
+        Toast.makeText(this, "La cantidad de loggeos es: " + logueos, Toast.LENGTH_LONG).show();
     }
 
     private void populateFiles() {
+//        try {
+//            FileOutputStream fileout = openFileOutput("holamundo.txt", MODE_PRIVATE);
+//            OutputStreamWriter outputWriter = new OutputStreamWriter(fileout);
+//            outputWriter.write("Estoy en Androidizate!");
+//            outputWriter.close();
+//
+//            Toast.makeText(getBaseContext(), "Archivo Guardado Satifactoriamente!", Toast.LENGTH_SHORT).show();
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
         try {
-            FileOutputStream fileout = openFileOutput("holamundo.txt", MODE_PRIVATE);
-            OutputStreamWriter outputWriter = new OutputStreamWriter(fileout);
-            outputWriter.write("Estoy en Androidizate!");
-            outputWriter.close();
-
-            Toast.makeText(getBaseContext(), "Archivo Guardado Satifactoriamente!", Toast.LENGTH_SHORT).show();
-
+            File nuevaCarpeta = new File(Environment.getExternalStorageDirectory(), "clase9");
+            if (!nuevaCarpeta.exists()) {
+                nuevaCarpeta.mkdir();
+            }
+            try {
+                File file = new File(nuevaCarpeta, "Lo Hicimos Nosotros" + ".txt");
+                file.createNewFile();
+            } catch (Exception ex) {
+                Log.e("Error", "ex: " + ex);
+            }
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("Error", "e: " + e);
         }
     }
 
