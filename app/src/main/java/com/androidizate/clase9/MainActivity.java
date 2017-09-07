@@ -2,6 +2,7 @@ package com.androidizate.clase9;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -12,7 +13,11 @@ import com.androidizate.clase9.helper.DatabaseHelper;
 import com.androidizate.clase9.model.Tag;
 import com.androidizate.clase9.model.Todo;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.List;
 
@@ -39,6 +44,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
+        copyFile();
+
+        setSharedPreferences();
+
         populateDb();
         populateSharedPreferences();
         populateFiles();
@@ -51,6 +60,57 @@ public class MainActivity extends AppCompatActivity {
         edit.putString("username", "billy");
         edit.putString("user_id", "65");
         edit.apply();
+    }
+
+    private void copyFile(){
+        String fromFile = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/ejercicios-de-coordinacion-tenis.jpg";
+        String toFolder = Environment.getExternalStorageDirectory() + "/Androidizate";
+        String toFile = toFolder + "/ejercicios-de-coordinacion-tenis2.jpg";
+
+        FileInputStream fileInputStream = null;
+        FileOutputStream fileOutputStream = null;
+
+        File folder = new File(toFolder);
+        if (!folder.exists())
+            folder.mkdir();
+
+        try {
+            fileInputStream = new FileInputStream(fromFile);
+            fileOutputStream = new FileOutputStream(toFile);
+
+            byte[] buffer = new byte[1024];
+            int noOfBytes = 0;
+
+            while ((noOfBytes = fileInputStream.read(buffer)) != -1) {
+                fileOutputStream.write(buffer, 0, noOfBytes);
+            }
+        } catch (FileNotFoundException e) {
+            Log.e("", "Imagen no encontrada");
+        } catch (IOException ioe) {
+            Log.e("", "Error de lectura");
+        } finally {
+            try {
+                if (fileInputStream != null) {
+                    fileInputStream.close();
+                }
+                if (fileOutputStream != null) {
+                    fileOutputStream.close();
+                }
+            } catch (IOException ioe) {
+                Log.e("", "Error cerrando el stream");
+            }
+        }
+    }
+
+    private void setSharedPreferences(){
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        int cntIniciosSesion = pref.getInt("cntIniciosSesion", 0);
+
+        SharedPreferences.Editor edit = pref.edit();
+        edit.putInt("cntIniciosSesion", cntIniciosSesion + 1);
+        edit.apply();
+
+        Toast.makeText(this, "Cantidad de ingresos " + cntIniciosSesion, Toast.LENGTH_LONG).show();
     }
 
     private void populateFiles() {
