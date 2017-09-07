@@ -1,6 +1,7 @@
 package com.androidizate.clase9;
 
 import android.content.SharedPreferences;
+import android.media.SoundPool;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
@@ -48,6 +49,10 @@ public class MainActivity extends AppCompatActivity {
     private void registrarUsuario() {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor edit = pref.edit();
+        edit.putBoolean("Sound", true);
+        edit.putBoolean("Vibration", true);
+        int suma = pref.getInt("suma", 0) +1;
+        edit.putInt("suma", suma);
         edit.putString("username", "billy");
         edit.putString("user_id", "65");
         edit.apply();
