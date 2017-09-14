@@ -1,17 +1,26 @@
 package com.androidizate.clase9.model;
 
+import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.PrimaryKey;
+
+import java.util.Date;
+
 /**
  * @author Andres Oller
  */
-
+@Entity
 public class Todo {
 
+    @PrimaryKey(autoGenerate = true)
     private int id;
+    @ColumnInfo(name = "note")
     private String note;
+    @ColumnInfo(name = "status")
     private int status;
-    private String created_at;
+    @ColumnInfo(name = "createdAt")
+    private Date createdAt;
 
-    // constructors
     public Todo() {
     }
 
@@ -20,39 +29,35 @@ public class Todo {
         this.status = status;
     }
 
-    public Todo(int id, String note, int status) {
-        this.id = id;
-        this.note = note;
-        this.status = status;
+    public int getId() {
+        return id;
     }
 
-    // setters
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getNote() {
+        return note;
     }
 
     public void setNote(String note) {
         this.note = note;
     }
 
+    public int getStatus() {
+        return status;
+    }
+
     public void setStatus(int status) {
         this.status = status;
     }
 
-    public void setCreatedAt(String created_at) {
-        this.created_at = created_at;
+    public Date getCreatedAt() {
+        return createdAt;
     }
 
-    // getters
-    public long getId() {
-        return this.id;
-    }
-
-    public String getNote() {
-        return this.note;
-    }
-
-    public int getStatus() {
-        return this.status;
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
     }
 }

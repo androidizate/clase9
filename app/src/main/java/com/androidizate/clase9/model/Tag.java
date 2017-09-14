@@ -1,41 +1,42 @@
 package com.androidizate.clase9.model;
 
+import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.PrimaryKey;
+
 /**
  * @author Andres Oller
  */
+@Entity
 public class Tag {
 
+    @PrimaryKey
     private int id;
-    private String tag_name;
+    @ColumnInfo(name = "tagName")
+    private String tagName;
 
     public Tag() {
 
     }
 
-    public Tag(String tag_name) {
-        this.tag_name = tag_name;
-    }
-
-    public Tag(int id, String tag_name) {
+    public Tag(int id, String tagName) {
         this.id = id;
-        this.tag_name = tag_name;
+        this.tagName = tagName;
     }
 
-    // setter
     public void setId(int id) {
         this.id = id;
     }
 
     public void setTagName(String tag_name) {
-        this.tag_name = tag_name;
+        this.tagName = tag_name;
     }
 
-    // getter
     public int getId() {
         return this.id;
     }
 
     public String getTagName() {
-        return this.tag_name;
+        return this.tagName;
     }
 }
