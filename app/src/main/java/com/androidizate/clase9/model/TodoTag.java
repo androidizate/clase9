@@ -1,42 +1,58 @@
 package com.androidizate.clase9.model;
 
-import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.ForeignKey;
+import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Id;
+import org.greenrobot.greendao.annotation.NotNull;
+import org.greenrobot.greendao.annotation.Property;
+import org.greenrobot.greendao.annotation.Generated;
 
 /**
  * @author Andres Oller
  */
-@Entity(foreignKeys = {
-        @ForeignKey(entity = Todo.class, parentColumns = "id", childColumns = "todo_id"),
-        @ForeignKey(entity = Tag.class, parentColumns = "id", childColumns = "tag_id")
-})
+@Entity
 public class TodoTag {
 
-    @ColumnInfo(name = "todo_id")
-    int todoId;
+    @Id(autoincrement = true)
+    private Long id;
+    @NotNull
+    @Property(nameInDb = "todo_id")
+    private Long todoId;
+    @NotNull
+    @Property(nameInDb = "tag_id")
+    private Long tagId;
 
-    @ColumnInfo(name = "tag_id")
-    int tagId;
-
-    public TodoTag(int todoId, int tagId) {
+    @Generated(hash = 1043261838)
+    public TodoTag(Long id, @NotNull Long todoId, @NotNull Long tagId) {
+        this.id = id;
         this.todoId = todoId;
         this.tagId = tagId;
     }
 
-    public int getTodoId() {
+    @Generated(hash = 1516555268)
+    public TodoTag() {
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getTodoId() {
         return todoId;
     }
 
-    public void setTodoId(int todoId) {
+    public void setTodoId(Long todoId) {
         this.todoId = todoId;
     }
 
-    public int getTagId() {
+    public Long getTagId() {
         return tagId;
     }
 
-    public void setTagId(int tagId) {
+    public void setTagId(Long tagId) {
         this.tagId = tagId;
     }
 }

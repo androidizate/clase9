@@ -1,7 +1,7 @@
 package com.androidizate.clase9;
 
-import android.arch.persistence.room.Room;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteConstraintException;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
@@ -9,24 +9,28 @@ import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.androidizate.clase9.db.AppDatabase;
+import com.androidizate.clase9.model.DaoSession;
 import com.androidizate.clase9.model.Tag;
 import com.androidizate.clase9.model.Todo;
 import com.androidizate.clase9.model.TodoTag;
 
+import org.greenrobot.greendao.AbstractDao;
+
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    AppDatabase db;
+    DaoSession daoSession;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "todo_app").build();
+        daoSession = ((MyApplication) getApplication()).getDaoSession();
     }
 
     @Override
@@ -73,119 +77,241 @@ public class MainActivity extends AppCompatActivity {
 
     private void populateDb() {
         // Creamos tags
-        Tag tag1 = new Tag(0, "Shopping");
+        Tag tag1 = new Tag();
+        tag1.setTagName("Shopping");
         ((TextView) findViewById(R.id.tv_tag_1)).setText(tag1.getTagName());
-        Tag tag2 = new Tag(1, "Importante");
+        Tag tag2 = new Tag();
+        tag2.setTagName("Importante");
         ((TextView) findViewById(R.id.tv_tag_2)).setText(tag2.getTagName());
-        Tag tag3 = new Tag(2, "Peliculas");
+        Tag tag3 = new Tag();
+        tag3.setTagName("Peliculas");
         ((TextView) findViewById(R.id.tv_tag_3)).setText(tag3.getTagName());
-        Tag tag4 = new Tag(3, "Androidizate");
+        Tag tag4 = new Tag();
+        tag4.setTagName("Androidizate");
         ((TextView) findViewById(R.id.tv_tag_4)).setText(tag4.getTagName());
 
-        ((TextView) findViewById(R.id.tv_tags_quantity)).setText("Cantidad de Tags: " + db.tagDao().getAll().size());
+        try {
+            daoSession.insert(tag1);
+            daoSession.insert(tag2);
+            daoSession.insert(tag3);
+            daoSession.insert(tag4);
+        } catch (SQLiteConstraintException exception) {
+            exception.printStackTrace();
+        }
 
-        db.tagDao().insertAll(tag1, tag2, tag3, tag4);
+        ((TextView) findViewById(R.id.tv_tags_quantity)).setText("Cantidad de Tags: " + daoSession.getTagDao().count());
 
+        List<Todo> todos = new ArrayList<>();
         // Creamos los ToDos
-        Todo todo1 = new Todo("Asado", 0);
-        Todo todo2 = new Todo("Samsung S8", 0);
-        Todo todo3 = new Todo("Auto", 0);
+        Todo todo1 = new Todo();
+        todo1.setCreatedAt(new Date(System.currentTimeMillis()));
+        todo1.setNote("Asado");
 
-        Todo todo4 = new Todo("Bourne", 0);
-        Todo todo5 = new Todo("Batman vs Superman", 0);
-        Todo todo6 = new Todo("Guardianes de la Galaxia 2", 0);
-        Todo todo7 = new Todo("Star Wars: Episode IV", 0);
+        Todo todo2 = new Todo();
+        todo2.setCreatedAt(new Date(System.currentTimeMillis()));
+        todo2.setNote("Samsung S8");
 
-        Todo todo8 = new Todo("Llamar a reservar el after", 0);
-        Todo todo9 = new Todo("Sacar plata del cajero", 0);
+        Todo todo3 = new Todo();
+        todo3.setCreatedAt(new Date(System.currentTimeMillis()));
+        todo3.setNote("Auto");
 
-        Todo todo10 = new Todo("Crear una nueva app", 0);
-        Todo todo11 = new Todo("Estudiar mucho", 0);
+        Todo todo4 = new Todo();
+        todo4.setCreatedAt(new Date(System.currentTimeMillis()));
+        todo4.setNote("Bourne");
+
+        Todo todo5 = new Todo();
+        todo5.setCreatedAt(new Date(System.currentTimeMillis()));
+        todo5.setNote("Batman vs Superman");
+
+        Todo todo6 = new Todo();
+        todo6.setCreatedAt(new Date(System.currentTimeMillis()));
+        todo6.setNote("Guardianes de la Galaxia 2");
+
+        Todo todo7 = new Todo();
+        todo7.setCreatedAt(new Date(System.currentTimeMillis()));
+        todo7.setNote("Star Wars: Episode IV");
+
+        Todo todo8 = new Todo();
+        todo8.setCreatedAt(new Date(System.currentTimeMillis()));
+        todo8.setNote("Llamar a reservar el after");
+
+        Todo todo9 = new Todo();
+        todo9.setCreatedAt(new Date(System.currentTimeMillis()));
+        todo9.setNote("Sacar plata del cajero");
+
+        Todo todo10 = new Todo();
+        todo10.setCreatedAt(new Date(System.currentTimeMillis()));
+        todo10.setNote("Crear una nueva app");
+
+        Todo todo11 = new Todo();
+        todo11.setCreatedAt(new Date(System.currentTimeMillis()));
+        todo11.setNote("Estudiar mucho");
+
+        todos.add(todo1);
+        todos.add(todo2);
+        todos.add(todo3);
+        todos.add(todo4);
+        todos.add(todo5);
+        todos.add(todo6);
+        todos.add(todo7);
+        todos.add(todo8);
+        todos.add(todo9);
+        todos.add(todo10);
+        todos.add(todo11);
 
         // Insertamos todos en la base de datos
-        db.todoDao().insertAll(todo1, todo2, todo3, todo4, todo5, todo6, todo7, todo8, todo9, todo10, todo11);
+        for (Todo todo : todos) {
+            try {
+                daoSession.insert(todo);
+            } catch (SQLiteConstraintException exception) {
+                exception.printStackTrace();
+            }
+        }
 
         // Insertamos todos bajo el tag "Shopping"
-        db.todoTagDao().insertTodoTags(new TodoTag(todo1.getId(), 1), new TodoTag(todo2.getId(), 1), new TodoTag(todo3.getId(), 1));
+        TodoTag todoTag1 = new TodoTag();
+        todoTag1.setTodoId(todo1.getId());
+        todoTag1.setTagId(tag1.getId());
+
+        TodoTag todoTag2 = new TodoTag();
+        todoTag2.setTodoId(todo2.getId());
+        todoTag2.setTagId(tag1.getId());
+
+        TodoTag todoTag3 = new TodoTag();
+        todoTag3.setTodoId(todo3.getId());
+        todoTag3.setTagId(tag1.getId());
+
+        daoSession.getTodoTagDao().insert(todoTag1);
+        daoSession.getTodoTagDao().insert(todoTag2);
+        daoSession.getTodoTagDao().insert(todoTag3);
 
         // Insertamos todos bajo el tag "Peliculas" Tag
-        db.todoTagDao().insertTodoTags(new TodoTag(todo4.getId(), 3), new TodoTag(todo5.getId(), 3), new TodoTag(todo6.getId(), 3), new TodoTag(todo7.getId(), 3));
+        TodoTag todoTag4 = new TodoTag();
+        todoTag4.setTodoId(todo4.getId());
+        todoTag4.setTagId(tag3.getId());
+
+        TodoTag todoTag5 = new TodoTag();
+        todoTag5.setTodoId(todo5.getId());
+        todoTag5.setTagId(tag3.getId());
+
+        TodoTag todoTag6 = new TodoTag();
+        todoTag6.setTodoId(todo6.getId());
+        todoTag6.setTagId(tag3.getId());
+
+        TodoTag todoTag7 = new TodoTag();
+        todoTag7.setTodoId(todo7.getId());
+        todoTag7.setTagId(tag3.getId());
+
+        daoSession.getTodoTagDao().insert(todoTag4);
+        daoSession.getTodoTagDao().insert(todoTag5);
+        daoSession.getTodoTagDao().insert(todoTag6);
+        daoSession.getTodoTagDao().insert(todoTag7);
 
         // Insertamos todos bajo el tag "Importante" Tag
-        db.todoTagDao().insertTodoTags(new TodoTag(todo8.getId(), 2), new TodoTag(todo9.getId(), 2));
+        TodoTag todoTag8 = new TodoTag();
+        todoTag8.setTodoId(todo8.getId());
+        todoTag8.setTagId(tag2.getId());
+
+        TodoTag todoTag9 = new TodoTag();
+        todoTag9.setTodoId(todo9.getId());
+        todoTag9.setTagId(tag2.getId());
+
+        daoSession.getTodoTagDao().insert(todoTag8);
+        daoSession.getTodoTagDao().insert(todoTag9);
 
         // Insertamos todos bajo el tag "Androidizate"
-        db.todoTagDao().insertTodoTags(new TodoTag(todo10.getId(), 4), new TodoTag(todo11.getId(), 4));
+        TodoTag todoTag10 = new TodoTag();
+        todoTag10.setTodoId(todo10.getId());
+        todoTag10.setTagId(tag4.getId());
 
-        fillTodos();
+        TodoTag todoTag11 = new TodoTag();
+        todoTag11.setTodoId(todo11.getId());
+        todoTag11.setTagId(tag4.getId());
 
-        ((TextView) findViewById(R.id.tv_todos_quantity)).setText("Cantidad de Todos: " + db.todoDao().getAll().size());
+        daoSession.getTodoTagDao().insert(todoTag10);
+        daoSession.getTodoTagDao().insert(todoTag11);
+
+        ((TextView) findViewById(R.id.tv_todos_quantity)).setText("Cantidad de Todos: " + daoSession.getTodoDao().count());
 
         // "Crear una nueva app" - la asignamos como "Importante"
         // Ahora va a tener 2 tags - "Androidizate" e "Importante"
-        db.todoTagDao().insertTodoTags(new TodoTag(todo10.getId(), 2));
+        TodoTag todoTag12 = new TodoTag();
+        todoTag12.setTodoId(todo10.getId());
+        todoTag12.setTagId(tag2.getId());
+
+        daoSession.getTodoTagDao().insert(todoTag12);
 
         // Buscamos todos los nombres de tags
         Log.d("Buscar Tags", "Buscamos todos los Tags");
-        List<Tag> allTags = db.tagDao().getAll();
+        List<Tag> allTags = daoSession.getTagDao().loadAll();
         for (Tag tag : allTags) {
             Log.d("Nombre del Tag", tag.getTagName());
         }
 
         // Buscamos todos los Todos
         Log.d("Buscar Todos", "Buscamos todos los ToDos");
-        List<Todo> allToDos = db.todoDao().getAll();
+        List<Todo> allToDos = daoSession.getTodoDao().loadAll();
         for (Todo todo : allToDos) {
             Log.d("ToDo", todo.getNote());
         }
 
         // Buscamos todos los todos bajo el tag "Peliculas"
         Log.d("ToDo", "Buscamos todos los ToDos bajo un Tag");
-        List<Todo> moviesList = db.todoDao().getTodosByTag(tag3.getTagName());
+        List<Todo> moviesList = daoSession.getTodoDao()._queryTag_Todos(tag3.getId());
         for (Todo todo : moviesList) {
             Log.d("ToDo Peliculas", todo.getNote());
         }
 
+        fillTodo(R.id.tv_todo_1, daoSession.getTodoDao().load(todo1.getId()), daoSession.getTodoTagDao().loadAll());
+        fillTodo(R.id.tv_todo_2, daoSession.getTodoDao().load(todo2.getId()), daoSession.getTodoTagDao().loadAll());
+        fillTodo(R.id.tv_todo_3, daoSession.getTodoDao().load(todo3.getId()), daoSession.getTodoTagDao().loadAll());
+        fillTodo(R.id.tv_todo_4, daoSession.getTodoDao().load(todo4.getId()), daoSession.getTodoTagDao().loadAll());
+        fillTodo(R.id.tv_todo_5, daoSession.getTodoDao().load(todo5.getId()), daoSession.getTodoTagDao().loadAll());
+        fillTodo(R.id.tv_todo_6, daoSession.getTodoDao().load(todo6.getId()), daoSession.getTodoTagDao().loadAll());
+        fillTodo(R.id.tv_todo_7, daoSession.getTodoDao().load(todo7.getId()), daoSession.getTodoTagDao().loadAll());
+        fillTodo(R.id.tv_todo_8, daoSession.getTodoDao().load(todo8.getId()), daoSession.getTodoTagDao().loadAll());
+        fillTodo(R.id.tv_todo_9, daoSession.getTodoDao().load(todo9.getId()), daoSession.getTodoTagDao().loadAll());
+        fillTodo(R.id.tv_todo_10, daoSession.getTodoDao().load(todo10.getId()), daoSession.getTodoTagDao().loadAll());
+        fillTodo(R.id.tv_todo_11, daoSession.getTodoDao().load(todo11.getId()), daoSession.getTodoTagDao().loadAll());
+
         // Borramos un ToDo
         Log.d("Borrar ToDo", "Borramos un Todo");
-        Log.d("Cantidad de ToDos", "Cantidad de ToDos antes de elimnar el ToDo: " + db.todoDao().getAll().size());
-        db.todoDao().delete(db.todoDao().findById(8));
-        Log.d("Cantidad de ToDos", "Cantidad de ToDos despues de elimnar el ToDo: " + db.todoDao().getAll().size());
+        Log.d("Cantidad de ToDos", "Cantidad de ToDos antes de elimnar el ToDo: " + daoSession.getTodoDao().count());
+        daoSession.getTodoDao().delete(todo8);
+        Log.d("Cantidad de ToDos", "Cantidad de ToDos despues de elimnar el ToDo: " + daoSession.getTodoDao().count());
 
         // Eliminamos todos los ToDos del tag "Shopping"
-        Log.d("Cantidad de ToDos", "Cantidad de ToDos antes de eliminar el tag 'Shopping': " + db.todoDao().getAll().size());
-        db.tagDao().delete(db.tagDao().findById(1));
-        Log.d("Cantidad de ToDos", "Cantidad de ToDos despues de elimnar el tag 'Shopping': " + db.todoDao().getAll().size());
+        Log.d("Cantidad de ToDos", "Cantidad de ToDos antes de eliminar el tag 'Shopping': " + daoSession.getTagDao().count());
+        daoSession.getTagDao().delete(tag1);
+        Log.d("Cantidad de ToDos", "Cantidad de ToDos despues de elimnar el tag 'Shopping': " + daoSession.getTodoDao().count());
 
         // Actualizamos el nombre del tag
         tag3.setTagName("Peliculas a mirar");
-        db.tagDao().updateTags(tag3);
-    }
-
-    private void fillTodos() {
-        fillTodo(R.id.tv_todo_1, db.todoDao().findById(1), db.todoTagDao().findById(1));
-        fillTodo(R.id.tv_todo_2, db.todoDao().findById(2), db.todoTagDao().findById(2));
-        fillTodo(R.id.tv_todo_3, db.todoDao().findById(3), db.todoTagDao().findById(3));
-        fillTodo(R.id.tv_todo_4, db.todoDao().findById(4), db.todoTagDao().findById(4));
-        fillTodo(R.id.tv_todo_5, db.todoDao().findById(5), db.todoTagDao().findById(5));
-        fillTodo(R.id.tv_todo_6, db.todoDao().findById(6), db.todoTagDao().findById(6));
-        fillTodo(R.id.tv_todo_7, db.todoDao().findById(7), db.todoTagDao().findById(7));
-        fillTodo(R.id.tv_todo_8, db.todoDao().findById(8), db.todoTagDao().findById(8));
-        fillTodo(R.id.tv_todo_9, db.todoDao().findById(9), db.todoTagDao().findById(9));
-        fillTodo(R.id.tv_todo_10, db.todoDao().findById(10), db.todoTagDao().findById(10));
-        fillTodo(R.id.tv_todo_11, db.todoDao().findById(11), db.todoTagDao().findById(11));
+        daoSession.getTagDao().update(tag3);
     }
 
     private void fillTodo(int resource, Todo todo, List<TodoTag> todoTags) {
         String newText = null;
-        for (int i = 0; i < todoTags.size(); i++) {
-            Tag tag = db.tagDao().findById(todoTags.get(i).getTagId());
-            if (i == 0) {
-                newText = todo.getNote() + " - " + tag.getId();
-            } else {
-                newText = newText + ", " + tag.getTagName();
+        int i = 0;
+        for (TodoTag todoTag : todoTags) {
+            if (todo.getId() == todoTag.getTodoId()) {
+                Tag tag = daoSession.getTagDao().load(todoTag.getTagId());
+                if (i == 0) {
+                    newText = todo.getNote() + " - " + tag.getTagName();
+                } else {
+                    newText = newText + ", " + tag.getTagName();
+                }
+                i++;
             }
         }
         ((TextView) findViewById(resource)).setText(newText);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        for (AbstractDao dao : daoSession.getAllDaos()) {
+            dao.deleteAll();
+        }
     }
 }
