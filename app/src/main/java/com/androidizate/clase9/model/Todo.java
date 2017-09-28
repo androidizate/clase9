@@ -1,6 +1,8 @@
 package com.androidizate.clase9.model;
 
+import org.greenrobot.greendao.DaoException;
 import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Index;
 import org.greenrobot.greendao.annotation.JoinEntity;
@@ -9,8 +11,6 @@ import org.greenrobot.greendao.annotation.ToMany;
 
 import java.util.Date;
 import java.util.List;
-import org.greenrobot.greendao.annotation.Generated;
-import org.greenrobot.greendao.DaoException;
 
 /**
  * @author Andres Oller
@@ -33,10 +33,14 @@ public class Todo {
             targetProperty = "tagId"
     )
     private List<Tag> tags;
-    /** Used to resolve relations */
+    /**
+     * Used to resolve relations
+     */
     @Generated(hash = 2040040024)
     private transient DaoSession daoSession;
-    /** Used for active entity operations. */
+    /**
+     * Used for active entity operations.
+     */
     @Generated(hash = 1860181255)
     private transient TodoDao myDao;
 
@@ -106,7 +110,9 @@ public class Todo {
         return tags;
     }
 
-    /** Resets a to-many relationship, making the next get call to query for a fresh result. */
+    /**
+     * Resets a to-many relationship, making the next get call to query for a fresh result.
+     */
     @Generated(hash = 404234)
     public synchronized void resetTags() {
         tags = null;
