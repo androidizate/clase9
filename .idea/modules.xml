@@ -4,8 +4,9 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Clase9.iml" filepath="$PROJECT_DIR$/Clase9.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/greendao.iml" filepath="$PROJECT_DIR$/.idea/greendao.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/persistencia.iml" filepath="$PROJECT_DIR$/.idea/modules/persistencia.iml" group="persistencia" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/persistencia-app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/persistencia-app.iml" group="persistencia/app" />
     </modules>
   </component>
 </project>
